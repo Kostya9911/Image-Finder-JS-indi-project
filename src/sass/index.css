@@ -1,1 +1,28 @@
-@import '~node_modules/modern-normalize/modern-normalize.css';/*# sourceMappingURL=index.css.map */
+@import '~node_modules/modern-normalize/modern-normalize.css';
+.search-form {
+  display: flex;
+  padding: 7px;
+  height: 50px;
+  justify-content: center;
+  background-color: CornflowerBlue;
+}
+.search-form__input {
+  width: 350px;
+  padding-bottom: 4px;
+  padding-left: 15px;
+  outline: none;
+  border: none;
+  border-radius: 5px 0px 0px 5px;
+}
+.search-form__btn {
+  width: 38px;
+  border: none;
+  border-radius: 0px 5px 5px 0px;
+  background-color: Gainsboro;
+  cursor: pointer;
+  fill: black;
+}
+.search-form__btn:hover {
+  background-color: lightslategrey;
+  fill: white;
+}/*# sourceMappingURL=index.css.map */
