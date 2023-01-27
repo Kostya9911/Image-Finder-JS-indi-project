@@ -1,67 +1,67 @@
 // Імпорти
-
-import Notiflix from 'notiflix';
+import { fetchPics } from './fetchpics';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import axios from 'axios';
-// console.log(axios);
 
 // Змінні DOM
 
 const form = document.querySelector('#search-form');
 const input = document.querySelector('input');
-const searchBtn = document.querySelector('.search-form__btn');
-const section = document.querySelector('section');
+const gallery = document.querySelector('.gallery');
+const moreBtn = document.querySelector('.load-more');
 
 // Змінні
 
-const KEY = '33109675-647afcf76cb57c4c0eb06a2e1';
 let inputValue;
+let page;
+let picsInfo;
+let totalPages;
+let lightbox = new SimpleLightbox('.gallery a');
 
 // Слухачі
 
 form.addEventListener('submit', submitForm);
+moreBtn.addEventListener('click', onLoad);
 
 // Функції
 
 function submitForm(evt) {
   evt.preventDefault();
+  moreBtn.hidden = true;
   inputValue = input.value.trim();
   form.reset();
-  section.innerHTML = '';
+  gallery.innerHTML = '';
+  page = 1;
 
   if (inputValue.length === 0) {
     return;
   }
-  fetchPics(inputValue).then(date => {
-    // console.log(date.data.hits);
-    const picsInfo = date.data.hits;
-    console.log(picsInfo[1].tags);
-    createMarkap(picsInfo);
-  });
+  fetchPics(inputValue)
+    .then(data => {
+      picsInfo = data.data.hits;
+      totalPages = Math.ceil(data.data.totalHits / picsInfo.length);
+      if (picsInfo.length === 0) {
+        Notify.failure(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+      } else Notify.success(`Hooray! We found ${data.data.totalHits} images`);
+
+      createMarkap(picsInfo);
+
+      new SimpleLightbox('.gallery a');
+      if (totalPages > 1) {
+        moreBtn.hidden = false;
+      }
+    })
+    .catch(error => {
+      console.log(error.code);
+      console.log(error.message);
+    });
 }
 
-function fetchPics(name) {
-  return (
-    axios
-      .get(
-        `https://pixabay.com/api/?key=${KEY}&q=${name}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40`
-      )
-      // .then(response => {
-      //   console.log(response);
-      //   // if (!response.ok) {
-      //   //   throw new Error(response.statusText);
-      //   // }
-      //   return response;
-      // })
-      .catch(error => {
-        console.log(error.statusText);
-      })
-  );
-}
-
-function createMarkap(data) {
-  const markap = data
+function createMarkap(picsInfo) {
+  const markap = picsInfo
     .map(
       ({
         webformatURL,
@@ -74,7 +74,7 @@ function createMarkap(data) {
       }) => `<div class="card">
       <div class="card__thumb-img">
        <a  href = "${largeImageURL}">
-      <img class="card__img" src="${webformatURL}" alt="${tags}" />
+      <img class="card__img" src="${webformatURL}" alt="${tags}" loading="lazy"/>
        </a>
       </div>
     <div class="card__thumb-info">
@@ -98,9 +98,30 @@ function createMarkap(data) {
   </div>`
     )
     .join('');
-  section.insertAdjacentHTML('beforeend', markap);
-  var lightbox = new SimpleLightbox('.main-section a', {
-    // captionsData: 'alt',
-    // captionDelay: 250,
+  gallery.insertAdjacentHTML('beforeend', markap);
+}
+
+function onLoad() {
+  page += 1;
+
+  fetchPics(inputValue, page).then(moreData => {
+    picsInfo = moreData.data.hits;
+    if (page >= totalPages) {
+      moreBtn.hidden = true;
+      Notify.info(`We're sorry, but you've reached the end of search results.`);
+    }
+
+    createMarkap(picsInfo);
+    lightbox.refresh();
+    scroll();
+  });
+}
+
+function scroll() {
+  const { height: cardHeight } =
+    gallery.firstElementChild.getBoundingClientRect();
+  window.scrollBy({
+    top: cardHeight * 1.7,
+    behavior: 'smooth',
   });
 }

@@ -1,13 +1,19 @@
+:root {
+  --main-col: CornflowerBlue;
+}
 h4,
 p {
   margin: 0;
 }
 .search-form {
+  position: fixed;
+  height: 50px;
+  width: 100%;
   display: flex;
   padding: 7px;
-  height: 50px;
+
   justify-content: center;
-  background-color: CornflowerBlue;
+  background-color: var(--main-col);
 
   &__input {
     width: 350px;
@@ -31,8 +37,8 @@ p {
     }
   }
 }
-.main-section {
-  padding-top: 10px;
+.gallery {
+  padding-top: 60px;
   padding-left: 10px;
   display: flex;
   flex-wrap: wrap;
@@ -49,13 +55,13 @@ p {
     width: 100%;
     height: 280px;
     padding: 3px;
-    // outline: 1px solid black;
     outline: none;
   }
   &__img {
     display: block;
     width: 100%;
     height: 100%;
+    object-fit: cover;
   }
   &__thumb-info {
     display: flex;
@@ -69,5 +75,25 @@ p {
   &__title-info {
     font-weight: 500;
     margin-bottom: 5px;
+  }
+}
+.load-btn {
+  margin: 20px auto 50px;
+  width: 230px;
+  height: 45px;
+}
+.load-more {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 5px;
+  font-size: 24px;
+  font-weight: 400;
+  color: white;
+  background-color: var(--main-col);
+  cursor: pointer;
+
+  &:hover {
+    background-color: RoyalBlue;
   }
 }
